@@ -10,7 +10,7 @@ Step 1: Basic Setup
 ================================================================
 1.1. Launch 1 VM (Ubuntu, 24.04, t2.large, 28 GB, Name: BMS-Server)
 ================================================================
-Open below ports for the Security Group attached to the above VM
+Open below ports for the Security Group attached to the above VM instance
 Type                  Protocol   Port range                              
 SMTP                  TCP           25 
 (Used for sending emails between mail servers)
