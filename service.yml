@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bms-service
+  namespace: bhagwat
   labels:
     app: bms
 spec:
@@ -11,3 +12,4 @@ spec:
     targetPort: 3000  # Replace with the port your app runs on
   selector:
     app: bms
+
