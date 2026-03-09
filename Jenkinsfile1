@@ -1,14 +1,14 @@
-(without K8S Stage)
 pipeline {
     agent any
     tools {
-        jdk 'jdk17'
+        jdk 'jdk21'
         nodejs 'node23'
     }
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
     }
     stages {
+
         stage('Clean Workspace') {
             steps {
                 cleanWs()
@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/akshu20791/Book-My-Show.git'
+                git branch: 'main', url: 'https://github.com/Bhagwat-io/Book-My-Show.git'
                 sh 'ls -la'  // Verify files after checkout
             }
         }
@@ -24,8 +24,8 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonar-server') {
                     sh ''' 
-                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BMS \
-                    -Dsonar.projectKey=BMS 
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=BMS_APP \
+                    -Dsonar.projectName=BMS_APP
                     '''
                 }
             }
@@ -33,7 +33,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
                 }
             }
         }
@@ -52,28 +52,14 @@ pipeline {
                 '''
             }
         }
-        stage('OWASP FS Scan') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        stage('Trivy FS Scan') {
-            steps {
-                sh 'trivy fs . > trivyfs.txt'
-            }
-        }
-        stage('Docker Build & Push') {
+        stage('Docker Build, tag  & Push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        sh ''' 
-                        echo "Building Docker image..."
-                        docker build --no-cache -t kastrov/bms:latest -f bookmyshow-app/Dockerfile bookmyshow-app
-
-                        echo "Pushing Docker image to registry..."
-                        docker push kastrov/bms:latest
-                        '''
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh 'docker build -t bms-app:v1.0.0 bookmyshow-app'
+                        sh 'docker tag bms-app:v1.0.0 bhagwat07/bms-app:v1.0.0'
+                        sh 'docker push bhagwat07/bms-app:v1.0.0'
+                        
                     }
                 }
             }
@@ -81,32 +67,58 @@ pipeline {
         stage('Deploy to Container') {
             steps {
                 sh ''' 
-                echo "Stopping and removing old container..."
-                docker stop bms || true
-                docker rm bms || true
-
                 echo "Running new container on port 3000..."
-                docker run -d --restart=always --name bms -p 3000:3000 kastrov/bms:latest
+                docker run -d --restart=always --name bms-app -p 3000:3000 bhagwat07/bms-app:v1.0.0
 
                 echo "Checking running containers..."
                 docker ps -a
 
                 echo "Fetching logs..."
                 sleep 5  # Give time for the app to start
-                docker logs bms
+                docker logs bms-app
+
                 '''
             }
         }
     }
     post {
-        always {
-            emailext attachLog: true,
-                subject: "'${currentBuild.result}'",
-                body: "Project: ${env.JOB_NAME}<br/>" +
-                      "Build Number: ${env.BUILD_NUMBER}<br/>" +
-                      "URL: ${env.BUILD_URL}<br/>",
-                to: 'kastrokiran@gmail.com',
-                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        success {
+            emailext (
+                subject: "SUCCESS: SonarQube Quality Gate Passed",
+                body: """
+                Hi Team,
+                
+                The SonarQube quality gate passed successfully.
+
+                You can view the report here:
+                http://18.188.130.88:9000/dashboard?id=BMS_APP
+                username: admin, passwd: pass
+
+                If you want to download a PDF report, please use the SonarQube interface or a PDF plugin.
+
+                Regards,
+                Jenkins
+                """,
+                to: 'bhagwatkolekar8664@gmail.com'
+            )
+        }
+        failure {
+            emailext (
+                subject: "FAILED: SonarQube Quality Gate",
+                body: """
+                Hi Team,
+                
+                The SonarQube quality gate has failed.
+                
+                Please check the details:
+                http://18.188.130.88:9000/dashboard?id=BMS_APP
+                username: admin, passwd: pass
+                
+                Regards,
+                Jenkins
+                """,
+                to: 'bhagwatkolekar8664@gmail.com'
+            )
         }
     }
 }

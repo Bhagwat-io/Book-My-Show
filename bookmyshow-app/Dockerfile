@@ -1,4 +1,4 @@
-# Use Node.js 18 (or your Jenkins-configured version)
+# Use Node.js 18 
 FROM node:18
 
 # Set working directory
