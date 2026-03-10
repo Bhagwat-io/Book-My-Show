@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+   
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Bhagwat-io/Book-My-Show.git'
+                sh 'ls -la'  // Verify files after checkout
+            }
+        }
+       
+        stage('Docker Build, tag  & Push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh 'docker build -t bms-app:v1.0.0 bookmyshow-app'
+                        sh 'docker tag bms-app:v1.0.0 bhagwat07/bms-app:v1.0.0'
+                        sh 'docker push bhagwat07/bms-app:v1.0.0'
+                        
+                    }
+                }
+            }
+        }
+        stage('Deploy to Container') {
+            steps {
+                sh ''' 
+                echo "Running new container on port 3000..."
+                docker run -d --restart=always --name bms-app -p 3000:3000 bhagwat07/bms-app:v1.0.0
+
+                echo "Checking running containers..."
+                docker ps -a
+
+                echo "Fetching logs..."
+                sleep 5  # Give time for the app to start
+                docker logs bms-app
+
+                '''
+            }
+        }
+    }
+}
+
