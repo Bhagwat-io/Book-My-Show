@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: bms-container
-        image: kastrov/bms:latest  
+        image: bhagwat07/bms-app:v1.0.0
         ports:
         - containerPort: 3000 
