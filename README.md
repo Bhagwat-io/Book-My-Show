@@ -1,118 +1,108 @@
-BookMyShow Application – DevOps CI/CD Deployment
-Project Overview
+🎬 BookMyShow Application – DevOps CI/CD Deployment
+📌 Project Overview
 
-This project demonstrates the implementation of a complete DevOps CI/CD pipeline for deploying the BookMyShow application. The goal was to automate the software delivery process using modern DevOps tools and practices including CI/CD automation, containerization, Kubernetes orchestration, and monitoring.
+This project demonstrates the implementation of a complete DevOps CI/CD pipeline for deploying the BookMyShow application.
 
-The application is built and deployed through an automated pipeline using GitHub, Jenkins, Docker, and Kubernetes (AWS EKS) with monitoring implemented using Prometheus and Grafana.
+The goal of this project was to automate the build, test, and deployment process using modern DevOps tools including GitHub, Jenkins, Docker, Kubernetes, and AWS.
 
-Architecture
+The application is automatically built, containerized, deployed to Kubernetes, and monitored using Prometheus and Grafana.
 
-The project follows a typical DevOps workflow:
+🏗️ Architecture
 
-Developer → GitHub → Jenkins CI/CD → Docker → DockerHub → Kubernetes (EKS) → Monitoring (Prometheus & Grafana)
+Developer 👨‍💻
+⬇
+GitHub Repository 📦
+⬇
+Jenkins CI/CD Pipeline ⚙️
+⬇
+Docker Containerization 🐳
+⬇
+DockerHub Registry 📤
+⬇
+Kubernetes Deployment (AWS EKS) ☸️
+⬇
+Monitoring (Prometheus + Grafana) 📊
 
-Tools & Technologies
-Category	Tools
-Project Management	Jira
-Version Control	Git, GitHub
-CI/CD	Jenkins
-Code Quality	SonarQube
-Containerization	Docker
-Container Registry	DockerHub
-Orchestration	Kubernetes (AWS EKS)
-Cloud	AWS EC2
-Monitoring	Prometheus, Grafana
-Alerts	Slack
-CI/CD Pipeline Stages
+🛠️ Tools & Technologies
+
+📋 Project Management --> 	Jira
+🗂  Version Control	--> Git, GitHub
+🔁 CI/CD	--> Jenkins
+🔍 Code Quality	--> SonarQube
+🐳 Containerization	--> Docker
+📦 Container Registry	--> DockerHub
+☸️ Container Orchestration	--> Kubernetes (AWS EKS)
+☁️ Cloud Platform	--> AWS (EC2)
+📊 Monitoring	--> Prometheus, Grafana
+🔔 Alerts	--> Slack
+
+
+⚙️ CI/CD Pipeline Stages
 
 The Jenkins pipeline automates the following stages:
 
-Clean Workspace
+1️⃣ Clean Workspace
+2️⃣ Checkout Source Code from GitHub
+3️⃣ SonarQube Code Analysis 🔍
+4️⃣ Install Dependencies 📦
+5️⃣ Build Docker Image 🐳
+6️⃣ Push Docker Image to DockerHub 📤
+7️⃣ Deploy Application Container 🚀
+8️⃣ Kubernetes Deployment on AWS EKS ☸️
+9️⃣ Email Notification for Build Status 📧
 
-Checkout Source Code from GitHub
-
-SonarQube Code Analysis
-
-Install Application Dependencies
-
-Build Docker Image
-
-Push Docker Image to DockerHub
-
-Deploy Application Container
-
-Kubernetes Deployment on AWS EKS
-
-Email Notification on Build Status
-
-Docker Implementation
+🐳 Docker Implementation
 
 Created a Dockerfile to containerize the BookMyShow application.
 
-Built Docker images automatically through Jenkins.
+Built Docker images automatically through Jenkins pipeline.
 
 Pushed images to DockerHub registry.
 
 Verified container deployment on port 3000.
 
-Kubernetes Deployment (AWS EKS)
+☸️ Kubernetes Deployment (AWS EKS)
 
-The application was deployed to AWS Elastic Kubernetes Service (EKS) using custom Kubernetes manifests.
+The application was deployed on AWS Elastic Kubernetes Service (EKS).
 
-Kubernetes Resources
+Kubernetes Resources Used
 
-Deployment
-
-Service (LoadBalancer)
-
-Namespace
+📦 Deployment
+🌐 Service (LoadBalancer)
+📁 Namespace
 
 Verification Commands
 kubectl get pods
 kubectl get svc
 kubectl get nodes
 
-The application was successfully exposed through a LoadBalancer service.
+The application was successfully exposed using a LoadBalancer service.
 
-Monitoring & Observability
+📊 Monitoring & Observability
 
 Monitoring was implemented using Prometheus and Grafana.
 
-Features Implemented
+Implemented Features
 
-Kubernetes cluster monitoring
+📈 Kubernetes cluster monitoring
+🖥 Node exporter system metrics
+📊 Grafana dashboards for visualization
+⚠️ Alert rules for high CPU usage
+🔔 Slack notifications for alerts
 
-Node exporter metrics
+🔗 Project Links
 
-Jenkins performance monitoring
-
-Grafana dashboards for visualization
-
-Alert rules for high CPU usage
-
-Slack notification integration for alerts
-
-Repository
-
-GitHub Repository:
+GitHub Repository
 https://github.com/Bhagwat-io/Book-My-Show
 
-DockerHub Image:
+DockerHub Image
 https://hub.docker.com/repository/docker/bhagwat07/bms-app
 
-Key Learning Outcomes
+🎯 Key Learning Outcomes
 
-Implemented end-to-end DevOps CI/CD automation
+✔️ Implemented end-to-end DevOps CI/CD pipeline
+✔️ Deployed containerized applications with Docker
+✔️ Managed Kubernetes deployments on AWS EKS
+✔️ Implemented monitoring & alerting using Prometheus and Grafana
+✔️ Integrated multiple DevOps tools into a single automated workflow
 
-Built and deployed containerized applications
-
-Managed Kubernetes deployments on AWS EKS
-
-Implemented monitoring and alerting for production environments
-
-Integrated DevOps tools into a complete pipeline
-
-Author
-
-Bhagwat Kolekar
-DevOps Trainee
