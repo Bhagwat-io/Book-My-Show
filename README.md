@@ -137,33 +137,6 @@ All tasks were self-assigned with start dates and due dates configured.
 - Kubernetes, Kubernetes CLI, Kubernetes Client API, Kubernetes Credentials
 - Config File Provider
 
-**Pipeline Stages:**
-
-```groovy
-pipeline {
-  agent any
-  tools {
-    jdk 'jdk21'
-    nodejs 'node23'
-  }
-  environment {
-    SCANNER_HOME = tool 'sonar-scanner'
-  }
-  stages {
-    stage('Clean Workspace')      { steps { cleanWs() } }
-    stage('Checkout from Git')    { steps { git branch: 'main', url: '...' } }
-    stage('SonarQube Analysis')   { steps { withSonarQubeEnv('sonar-server') { sh '...' } } }
-    stage('Quality Gate')         { steps { waitForQualityGate abortPipeline: false } }
-    stage('Install Dependencies') { steps { sh 'npm install' } }
-    stage('Docker Build, Tag & Push') { steps { withDockerRegistry(...) { sh 'docker build...' } } }
-    stage('Deploy to Container')  { steps { sh 'docker run -d --restart=always...' } }
-  }
-  post {
-    success { emailext subject: 'SUCCESS: SonarQube Quality Gate Passed', ... }
-    failure { emailext subject: 'FAILED: SonarQube Quality Gate', ... }
-  }
-}
-```
 
 **Credentials configured in Jenkins:**
 | ID | Type | Purpose |
@@ -182,38 +155,6 @@ pipeline {
 ### 4. Docker Deployment
 
 **DockerHub Image:** [https://hub.docker.com/repository/docker/bhagwat07/bms-app/tags](https://hub.docker.com/repository/docker/bhagwat07/bms-app/tags)
-
-**Dockerfile:**
-
-```dockerfile
-# Use Node.js 18
-FROM node:18
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package.json package-lock.json ./
-
-# Fix PostCSS compatibility
-RUN npm install postcss@8.4.21 postcss-safe-parser@6.0.0 --legacy-peer-deps
-
-# Install dependencies
-RUN npm install
-
-# Copy project files
-COPY . .
-
-# Expose port 3000
-EXPOSE 3000
-
-# Set environment variables
-ENV NODE_OPTIONS=--openssl-legacy-provider
-ENV PORT=3000
-
-# Start the application
-CMD ["npm", "start"]
-```
 
 **Docker run command:**
 ```bash
@@ -249,49 +190,6 @@ eksctl create cluster \
   --nodes 2
 ```
 
-**`deployment.yml`:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: bms-app
-  namespace: bhagwat
-  labels:
-    app: bms
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: bms
-  template:
-    metadata:
-      labels:
-        app: bms
-    spec:
-      containers:
-        - name: bms-container
-          image: bhagwat07/bms-app:v1.0.0
-          ports:
-            - containerPort: 3000
-```
-
-**`service.yml`:**
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: bms-service
-  namespace: bhagwat
-  labels:
-    app: bms
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 3000
-  selector:
-    app: bms
-```
 
 **Apply manifests:**
 ```bash
